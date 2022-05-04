@@ -1,0 +1,709 @@
+openapi: 3.0.1
+info:
+  description: "Proyecto UMG Help Desk"
+  version: "1.0.0"
+  title: "UMG Help Desk Service"
+  
+paths:
+  /users:
+    post:
+      tags:
+      - "Users"
+      summary: "Create user"
+      operationId: "createUser"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreation'
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: Not found
+    get:
+      tags:
+      - "Users"
+      summary: "List users"
+      operationId: "listUsers"
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/User'
+  /users/login:
+    get:
+      tags:
+      - "Users"
+      summary: "Logs user into the system"
+      description: ""
+      operationId: "loginUser"
+      parameters:
+        - name: "username"
+          schema:
+            type: "string"
+          in: "query"
+          required: true
+        - name: "password"
+          in: "query"
+          schema:
+            type: "string"
+          required: true
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: "Not found"
+        400:
+          description: "Invalid"
+  /users/{id}:
+    get:
+      tags:
+      - "Users"
+      summary: "Get user by id"
+      description: ""
+      operationId: "getUserById"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The name that needs to be fetched. Use user1 for testing. "
+        required: true
+        schema:
+          type: "string"
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: "Not found"
+        400:
+          description: "Invalid"
+    put:
+      tags:
+      - "Users"
+      summary: "Updated user"
+      description: "This can only be done by the logged in user."
+      operationId: "updateUser"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "name that need to be updated"
+        required: true
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: "Not found"
+        400:
+          description: "Invalid"
+  /users/{userId}/notifications:
+    get:
+      tags:
+      - "Users"
+      summary: "List notifications by user"
+      description: ""
+      operationId: "listNotificationsByUserId"
+      parameters:
+      - name: "userId"
+        in: "path"
+        description: "The name that needs to be fetched. Use user1 for testing. "
+        required: true
+        schema:
+          type: "string"
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/Notification'
+        404:
+          description: "Not found"
+        400:
+          description: "Invalid"
+  /departments:
+    get:
+      tags:
+      - "Departments"
+      summary: "List department"
+      operationId: "listDepartments"
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/Department'
+    post:
+      tags:
+      - "Departments"
+      summary: "Create department"
+      operationId: "createDepartment"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentCreation'
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        404:
+          description: Not found
+  /departments/{id}:
+    get:
+      tags:
+      - "Departments"
+      summary: "Get Department by id"
+      description: ""
+      operationId: "getDepartmentById"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The name that needs to be fetched. Use user1 for testing. "
+        required: true
+        schema:
+          type: "string"
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        404:
+          description: "Not found"
+        400:
+          description: "Invalid"
+    put:
+      tags:
+      - "Departments"
+      summary: "Updated Department"
+      description: "This can only be done by the logged in user."
+      operationId: "updateDepartment"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "name that need to be updated"
+        required: true
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepartmentUpdate'
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        404:
+          description: "Not found"
+        400:
+          description: "Invalid"
+  /ticket-categories:
+    get:
+      tags:
+      - "Ticket Categories"
+      summary: "List Ticket Category"
+      operationId: "listTicketCategories"
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/TicketCategory'
+    post:
+      tags:
+      - "Ticket Categories"
+      summary: "Create Ticket Category"
+      operationId: "createTicketCategory"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketCategoryCreation'
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketCategory'
+        404:
+          description: Not found
+  /ticket-categories/{id}:
+    get:
+      tags:
+      - "Ticket Categories"
+      summary: "Get TicketCategory by id"
+      description: ""
+      operationId: "getTicketCategoryById"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The name that needs to be fetched. Use user1 for testing. "
+        required: true
+        schema:
+          type: "string"
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketCategory'
+        404:
+          description: "Not found"
+        400:
+          description: "Invalid"
+    put:
+      tags:
+      - "Ticket Categories"
+      summary: "Updated TicketCategory"
+      description: "This can only be done by the logged in user."
+      operationId: "updateTicketCategory"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "name that need to be updated"
+        required: true
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketCategoryUpdate'
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketCategory'
+        404:
+          description: "Not found"
+        400:
+          description: "Invalid"
+  /tickets:
+    get:
+      tags:
+      - "Tickets"
+      summary: "List tickets"
+      operationId: "listTickets"
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/Ticket'
+    post:
+      tags:
+      - "Tickets"
+      summary: "Create ticket"
+      operationId: "createTicket"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketCreation'
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+  /tickets/{id}:
+    get:
+      tags:
+      - "Tickets"
+      summary: "Get Ticket by id"
+      description: ""
+      operationId: "getTicketById"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "The name that needs to be fetched. Use user1 for testing. "
+        required: true
+        schema:
+          type: "string"
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        404:
+          description: "Not found"
+        400:
+          description: "Invalid"
+    put:
+      tags:
+      - "Tickets"
+      summary: "Updated Ticket"
+      description: "This can only be done by the logged in user."
+      operationId: "updateTicket"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "name that need to be updated"
+        required: true
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketUpdate'
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        404:
+          description: "Not found"
+        400:
+          description: "Invalid"
+  /tickets/{ticketId}/comments:
+    get:
+      tags:
+      - "Tickets"
+      summary: "List ticket comments"
+      description: ""
+      operationId: "listTicketCommentsById"
+      parameters:
+      - name: "ticketId"
+        in: "path"
+        description: "The name that needs to be fetched. Use user1 for testing. "
+        required: true
+        schema:
+          type: "string"
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/TicketComment'
+        404:
+          description: "Not found"
+        400:
+          description: "Invalid"
+    post:
+      tags:
+      - "Tickets"
+      summary: "Create ticket comment"
+      operationId: "createTicketComment"
+      parameters:
+      - name: "ticketId"
+        in: "path"
+        description: "The name that needs to be fetched. Use user1 for testing. "
+        required: true
+        schema:
+          type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketCommentCreation'
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketComment'
+        404:
+          description: Not found
+  /tickets/{ticketId}/comments/{commentId}:
+    delete:
+      tags:
+      - "Tickets"
+      summary: "Delete Ticket Comment"
+      description: "This can only be done by the logged in user."
+      operationId: "deleteTicketComment"
+      parameters:
+      - name: "ticketId"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      - name: "commentId"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        202:
+          description: OK
+        404:
+          description: "Not found"
+        400:
+          description: "Invalid"
+components:
+  schemas:
+    Department:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        name:
+          type: "string"
+        description:
+          type: "string"
+      xml:
+        name: "Department"
+    DepartmentCreation:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        description:
+          type: "string"
+      xml:
+        name: "Department"
+    DepartmentUpdate:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        description:
+          type: "string"
+      xml:
+        name: "Department"
+    TicketCategory:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        name:
+          type: "string"
+        description:
+          type: "string"
+      xml:
+        name: "TicketCategory"
+    TicketCategoryCreation:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        name:
+          type: "string"
+        description:
+          type: "string"
+      xml:
+        name: "TicketCategoryCreation"
+    TicketCategoryUpdate:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        name:
+          type: "string"
+        description:
+          type: "string"
+      xml:
+        name: "TicketCategoryUpdate"
+    Notification:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        userId:
+          type: "string"
+        ticketId:
+          type: "string"
+        creationDate:
+          type: "string"
+          format: "date"
+        status:
+          type: "string"
+      xml:
+        name: "Notification"
+    Ticket:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        category:
+          $ref: '#/components/schemas/TicketCategory'
+        userCreated:
+          type: "string"
+        name:
+          type: "string"
+        description:
+          type: "string"
+        status:
+          type: "string"
+        creationDate:
+          type: "string"
+          format: "date-time"
+        assignedUser:
+          type: "string"
+        assignationDate:
+          type: "string"
+          format: "date-time"
+        closedDate:
+          type: "string"
+          format: "date-time"
+        hours:
+          type: "string"
+      xml:
+        name: "Notification"
+    TicketCreation:
+      type: "object"
+      properties:
+        categoryId:
+          type: "string"
+        userCreatedId:
+          type: "string"
+        name:
+          type: "string"
+        description:
+          type: "string"
+        assignedUserId:
+          type: "string"
+      xml:
+        name: "Notification"
+    TicketUpdate:
+      type: "object"
+      properties:
+        categoryId:
+          type: "string"
+        name:
+          type: "string"
+        description:
+          type: "string"
+        assignedUserId:
+          type: "string"
+      xml:
+        name: "Notification"
+    TicketComment:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        ticketId:
+          type: "string"
+        userCreated:
+          type: "string"
+        creationDate:
+          type: "string"
+          format: "date-time"
+        comment:
+          type: "string"
+    TicketCommentCreation:
+      type: "object"
+      properties:
+        ticketId:
+          type: "string"
+        userCreatedId:
+          type: "string"
+        comment:
+          type: "string"
+    User:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        username:
+          type: "string"
+        fullName:
+          type: "string"
+        email:
+          type: "string"
+        dateOfBirth:
+          type: "string"
+          format: "date"
+        userRole:
+          type: "string"
+        department:
+          type: "string"
+      xml:
+        name: "User"
+    UserCreation:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+        fullName:
+          type: "string"
+        email:
+          type: "string"
+        dateOfBirth:
+          type: "string"
+          format: "date"
+        userRole:
+          type: "string"
+        department:
+          type: "string"
+      xml:
+        name: "UserCreation"
+    UserUpdate:
+      type: "object"
+      properties:
+        fullName:
+          type: "string"
+        email:
+          type: "string"
+        dateOfBirth:
+          type: "string"
+          format: "date"
+        userRole:
+          type: "string"
+        department:
+          type: "string"
+      xml:
+        name: "UserUpdate"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
