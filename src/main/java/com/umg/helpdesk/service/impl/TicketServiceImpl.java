@@ -88,7 +88,7 @@ public class TicketServiceImpl implements ITicketService {
 	public TicketCommentDto createTicketComment(String ticketId, TicketCommentCreationDto ticketCommentCreationDto) {
 		TicketComment comment = new TicketComment();
 		comment.setComment(ticketCommentCreationDto.getComment());
-		comment.setTicketId(Long.parseLong(ticketCommentCreationDto.getTicketId()));
+		comment.setTicketId(Long.parseLong(ticketId));
 		comment.setUserCreatedId(Long.parseLong(ticketCommentCreationDto.getUserCreatedId()));
 		comment.setCreationDate(OffsetDateTime.now());
 		
@@ -98,7 +98,10 @@ public class TicketServiceImpl implements ITicketService {
 
 	@Override
 	public void deleteTicketComment(String ticketId, String commentId) {
-		ticketRepository.deleteById(Long.parseLong(commentId));
+		Optional<TicketComment> comment = ticketCommentRepository.findById(Long.parseLong(commentId));
+		if (comment.isPresent()) {
+			ticketCommentRepository.delete(comment.get());;
+		}
 	}
 
 	@Override
@@ -145,7 +148,7 @@ public class TicketServiceImpl implements ITicketService {
 		
 		Optional<User> userAssigned = Optional.empty();
 		if (ticketUpdateDto.getAssignedUserId() != null) {
-			if (opTicket.get().getUserAssigned() != null && !opTicket.get().getUserAssigned().getUserId().toString().equals(ticketUpdateDto.getAssignedUserId())) {
+			if (opTicket.get().getUserAssigned() == null || !opTicket.get().getUserAssigned().getUserId().toString().equals(ticketUpdateDto.getAssignedUserId())) {
 				userAssigned = userRepository.findById(Long.parseLong(ticketUpdateDto.getAssignedUserId()));	
 			}
 		}

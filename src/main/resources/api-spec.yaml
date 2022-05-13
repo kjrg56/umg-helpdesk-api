@@ -704,8 +704,6 @@ components:
     TicketCommentCreation:
       type: "object"
       properties:
-        ticketId:
-          type: "string"
         userCreatedId:
           type: "string"
         comment:
