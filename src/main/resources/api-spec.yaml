@@ -30,6 +30,17 @@ paths:
       - "Users"
       summary: "List users"
       operationId: "listUsers"
+      parameters:
+      - name: "offset"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+      - name: "limit"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
       responses:
         202:
           description: OK
@@ -136,6 +147,16 @@ paths:
         required: true
         schema:
           type: "string"
+      - name: "offset"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+      - name: "limit"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
       responses:
         202:
           description: OK
@@ -155,6 +176,17 @@ paths:
       - "Departments"
       summary: "List department"
       operationId: "listDepartments"
+      parameters:
+      - name: "offset"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+      - name: "limit"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
       responses:
         202:
           description: OK
@@ -243,6 +275,17 @@ paths:
       - "Ticket Categories"
       summary: "List Ticket Category"
       operationId: "listTicketCategories"
+      parameters:
+      - name: "offset"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+      - name: "limit"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
       responses:
         202:
           description: OK
@@ -331,6 +374,17 @@ paths:
       - "Tickets"
       summary: "List tickets"
       operationId: "listTickets"
+      parameters:
+      - name: "offset"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+      - name: "limit"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
       responses:
         202:
           description: OK
@@ -425,6 +479,16 @@ paths:
         required: true
         schema:
           type: "string"
+      - name: "offset"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
+      - name: "limit"
+        in: "query"
+        required: false
+        schema:
+          type: "integer"
       responses:
         202:
           description: OK
@@ -534,8 +598,6 @@ components:
     TicketCategoryCreation:
       type: "object"
       properties:
-        id:
-          type: "string"
         name:
           type: "string"
         description:
@@ -545,8 +607,6 @@ components:
     TicketCategoryUpdate:
       type: "object"
       properties:
-        id:
-          type: "string"
         name:
           type: "string"
         description:
@@ -577,7 +637,7 @@ components:
         category:
           $ref: '#/components/schemas/TicketCategory'
         userCreated:
-          type: "string"
+          $ref: '#/components/schemas/User'
         name:
           type: "string"
         description:
@@ -587,8 +647,8 @@ components:
         creationDate:
           type: "string"
           format: "date-time"
-        assignedUser:
-          type: "string"
+        userAssigned:
+          $ref: '#/components/schemas/User'
         assignationDate:
           type: "string"
           format: "date-time"
@@ -596,7 +656,7 @@ components:
           type: "string"
           format: "date-time"
         hours:
-          type: "string"
+          type: "integer"
       xml:
         name: "Notification"
     TicketCreation:
@@ -634,7 +694,7 @@ components:
           type: "string"
         ticketId:
           type: "string"
-        userCreated:
+        userCreatedId:
           type: "string"
         creationDate:
           type: "string"
@@ -667,13 +727,15 @@ components:
         userRole:
           type: "string"
         department:
-          type: "string"
+          $ref: '#/components/schemas/Department'
       xml:
         name: "User"
     UserCreation:
       type: "object"
       properties:
         username:
+          type: "string"
+        passwd:
           type: "string"
         fullName:
           type: "string"
@@ -684,7 +746,7 @@ components:
           format: "date"
         userRole:
           type: "string"
-        department:
+        departmentId:
           type: "string"
       xml:
         name: "UserCreation"
@@ -700,7 +762,7 @@ components:
           format: "date"
         userRole:
           type: "string"
-        department:
+        departmentId:
           type: "string"
       xml:
         name: "UserUpdate"
