@@ -13,21 +13,26 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.umg.helpdesk.model.Notification;
+import com.umg.helpdesk.model.NotificationStatus;
 import com.umg.helpdesk.model.Ticket;
 import com.umg.helpdesk.model.TicketCategory;
 import com.umg.helpdesk.model.TicketComment;
 import com.umg.helpdesk.model.TicketStatus;
 import com.umg.helpdesk.model.User;
+import com.umg.helpdesk.repository.INotificationRepository;
 import com.umg.helpdesk.repository.ITicketCategoryRepository;
 import com.umg.helpdesk.repository.ITicketCommentRepository;
 import com.umg.helpdesk.repository.ITicketRepository;
 import com.umg.helpdesk.repository.IUserRepository;
+import com.umg.helpdesk.rest.gen.dto.NotificationDto;
 import com.umg.helpdesk.rest.gen.dto.TicketCommentCreationDto;
 import com.umg.helpdesk.rest.gen.dto.TicketCommentDto;
 import com.umg.helpdesk.rest.gen.dto.TicketCreationDto;
 import com.umg.helpdesk.rest.gen.dto.TicketDto;
 import com.umg.helpdesk.rest.gen.dto.TicketUpdateDto;
 import com.umg.helpdesk.service.ITicketService;
+import com.umg.helpdesk.service.mapper.NotificationMapper;
 import com.umg.helpdesk.service.mapper.TicketCommentMapper;
 import com.umg.helpdesk.service.mapper.TicketMapper;
 import com.umg.helpdesk.service.utils.ModelUtils;
@@ -48,10 +53,16 @@ public class TicketServiceImpl implements ITicketService {
 	private ITicketCategoryRepository ticketCategoryRepository;
 	
 	@Autowired
+	private INotificationRepository notificationRepository;
+	
+	@Autowired
 	private TicketMapper ticketMapper;
 	
 	@Autowired
 	private TicketCommentMapper ticketCommentMapper;
+	
+	@Autowired
+	private NotificationMapper notificationMapper;
 	
 	@Transactional
 	@Override
@@ -80,7 +91,10 @@ public class TicketServiceImpl implements ITicketService {
 		}
 		
 		ticket = ticketRepository.save(ticket);
-		//TODO send notification
+		
+		if (ticket.getStatus().compareTo(TicketStatus.Assigned) == 0)
+			sendNotification(ticket.getTicketId(), ticket.getUserCreated().getUserId(), "Nuevo Ticket Asignado");
+		
 		return ticketMapper.toDto(ticket);
 	}
 
@@ -91,8 +105,19 @@ public class TicketServiceImpl implements ITicketService {
 		comment.setTicketId(Long.parseLong(ticketId));
 		comment.setUserCreatedId(Long.parseLong(ticketCommentCreationDto.getUserCreatedId()));
 		comment.setCreationDate(OffsetDateTime.now());
-		
 		comment = ticketCommentRepository.save(comment);
+		
+		if (ticketCommentCreationDto.getHours() != null && ticketCommentCreationDto.getHours().intValue() > 0) {
+			Optional<Ticket> opTicket = ticketRepository.findById(Long.parseLong(ticketId));
+			if (opTicket.isPresent()) {
+				Ticket ticket = opTicket.get();
+				int hours = ticket.getHours() == null ? 0 : ticket.getHours();
+				hours += ticketCommentCreationDto.getHours();
+				ticket.setHours(hours);
+				ticketRepository.save(ticket);
+			}
+		}
+		
 		return ticketCommentMapper.toDto(comment);
 	}
 
@@ -119,7 +144,8 @@ public class TicketServiceImpl implements ITicketService {
 		int page = ModelUtils.getPageNumber(offset, limit);
 		Pageable pageable = PageRequest.of(page, limit, Direction.DESC, "TicketCommentId");
 		
-		return ticketCommentRepository.findAll(pageable).stream()
+		return ticketCommentRepository.findAllByTicketId(Long.parseLong(ticketId), pageable)
+				.stream()
 				.map(ticketCommentMapper::toDto)
 				.collect(Collectors.toList());
 	}
@@ -168,13 +194,43 @@ public class TicketServiceImpl implements ITicketService {
 			ticket.setUserAssigned(userAssigned.get());
 			ticket.setAssignationDate(OffsetDateTime.now());
 			ticket.setStatus(TicketStatus.Assigned);
+			
+			sendNotification(ticket.getTicketId(), ticket.getUserCreated().getUserId(), "Nuevo Ticket Asignado");
 		}
 		
-		//TODO be able to update status, by PATCH
+		if (ticketUpdateDto.getStatus() != null)
+			ticket.setStatus(TicketStatus.valueOf(ticketUpdateDto.getStatus()));
 		
 		ticket = ticketRepository.save(ticket);
-		//TODO send notification
 		return ticketMapper.toDto(ticket);
 	}
 
+	@Override
+	public TicketDto closeTicket(String id) {
+		Optional<Ticket> opTicket = ticketRepository.findById(Long.parseLong(id));
+		if (!opTicket.isPresent())
+			return null;
+		
+		Ticket ticket = opTicket.get();
+		ticket.setClosedDate(OffsetDateTime.now());
+		ticket.setStatus(TicketStatus.Closed);
+		ticket = ticketRepository.save(ticket);
+		
+		sendNotification(ticket.getTicketId(), ticket.getUserCreated().getUserId(), "Ticket Cerrado");
+		
+		return ticketMapper.toDto(ticket);
+	}
+	
+	public NotificationDto sendNotification(Long ticketId, Long userId, String message) {
+		Notification notification = new Notification();
+		notification.setCreationDate(OffsetDateTime.now());
+		notification.setStatus(NotificationStatus.NotViewed);
+		notification.setTicketId(ticketId);
+		notification.setUserId(userId);
+		notification.setMessage(message);
+		
+		notification = notificationRepository.save(notification);
+		return notificationMapper.toDto(notification);
+	}
+	
 }

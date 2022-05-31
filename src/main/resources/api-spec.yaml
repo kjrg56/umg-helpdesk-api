@@ -8,7 +8,7 @@ paths:
   /users:
     post:
       tags:
-      - "Users"
+      - "users"
       summary: "Create user"
       operationId: "createUser"
       requestBody:
@@ -27,7 +27,7 @@ paths:
           description: Not found
     get:
       tags:
-      - "Users"
+      - "users"
       summary: "List users"
       operationId: "listUsers"
       parameters:
@@ -53,7 +53,7 @@ paths:
   /users/login:
     get:
       tags:
-      - "Users"
+      - "users"
       summary: "Logs user into the system"
       description: ""
       operationId: "loginUser"
@@ -82,7 +82,7 @@ paths:
   /users/{id}:
     get:
       tags:
-      - "Users"
+      - "users"
       summary: "Get user by id"
       description: ""
       operationId: "getUserById"
@@ -106,7 +106,7 @@ paths:
           description: "Invalid"
     put:
       tags:
-      - "Users"
+      - "users"
       summary: "Updated user"
       description: "This can only be done by the logged in user."
       operationId: "updateUser"
@@ -136,7 +136,7 @@ paths:
   /users/{userId}/notifications:
     get:
       tags:
-      - "Users"
+      - "users"
       summary: "List notifications by user"
       description: ""
       operationId: "listNotificationsByUserId"
@@ -173,7 +173,7 @@ paths:
   /departments:
     get:
       tags:
-      - "Departments"
+      - "departments"
       summary: "List department"
       operationId: "listDepartments"
       parameters:
@@ -198,7 +198,7 @@ paths:
                   $ref: '#/components/schemas/Department'
     post:
       tags:
-      - "Departments"
+      - "departments"
       summary: "Create department"
       operationId: "createDepartment"
       requestBody:
@@ -218,7 +218,7 @@ paths:
   /departments/{id}:
     get:
       tags:
-      - "Departments"
+      - "departments"
       summary: "Get Department by id"
       description: ""
       operationId: "getDepartmentById"
@@ -242,7 +242,7 @@ paths:
           description: "Invalid"
     put:
       tags:
-      - "Departments"
+      - "departments"
       summary: "Updated Department"
       description: "This can only be done by the logged in user."
       operationId: "updateDepartment"
@@ -272,7 +272,7 @@ paths:
   /ticket-categories:
     get:
       tags:
-      - "Ticket Categories"
+      - "ticket-categories"
       summary: "List Ticket Category"
       operationId: "listTicketCategories"
       parameters:
@@ -297,7 +297,7 @@ paths:
                   $ref: '#/components/schemas/TicketCategory'
     post:
       tags:
-      - "Ticket Categories"
+      - "ticket-categories"
       summary: "Create Ticket Category"
       operationId: "createTicketCategory"
       requestBody:
@@ -317,7 +317,7 @@ paths:
   /ticket-categories/{id}:
     get:
       tags:
-      - "Ticket Categories"
+      - "ticket-categories"
       summary: "Get TicketCategory by id"
       description: ""
       operationId: "getTicketCategoryById"
@@ -341,7 +341,7 @@ paths:
           description: "Invalid"
     put:
       tags:
-      - "Ticket Categories"
+      - "ticket-categories"
       summary: "Updated TicketCategory"
       description: "This can only be done by the logged in user."
       operationId: "updateTicketCategory"
@@ -371,7 +371,7 @@ paths:
   /tickets:
     get:
       tags:
-      - "Tickets"
+      - "tickets"
       summary: "List tickets"
       operationId: "listTickets"
       parameters:
@@ -396,7 +396,7 @@ paths:
                   $ref: '#/components/schemas/Ticket'
     post:
       tags:
-      - "Tickets"
+      - "tickets"
       summary: "Create ticket"
       operationId: "createTicket"
       requestBody:
@@ -414,7 +414,7 @@ paths:
   /tickets/{id}:
     get:
       tags:
-      - "Tickets"
+      - "tickets"
       summary: "Get Ticket by id"
       description: ""
       operationId: "getTicketById"
@@ -436,9 +436,9 @@ paths:
           description: "Not found"
         400:
           description: "Invalid"
-    put:
+    patch:
       tags:
-      - "Tickets"
+      - "tickets"
       summary: "Updated Ticket"
       description: "This can only be done by the logged in user."
       operationId: "updateTicket"
@@ -465,10 +465,34 @@ paths:
           description: "Not found"
         400:
           description: "Invalid"
+  /tickets/{ticketId}/close:
+    post:
+      tags:
+      - "tickets"
+      summary: "Close ticket"
+      description: "This can only be done by the logged in user."
+      operationId: "closeTicket"
+      parameters:
+      - name: "ticketId"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        404:
+          description: "Not found"
+        400:
+          description: "Invalid"
   /tickets/{ticketId}/comments:
     get:
       tags:
-      - "Tickets"
+      - "tickets"
       summary: "List ticket comments"
       description: ""
       operationId: "listTicketCommentsById"
@@ -504,7 +528,7 @@ paths:
           description: "Invalid"
     post:
       tags:
-      - "Tickets"
+      - "tickets"
       summary: "Create ticket comment"
       operationId: "createTicketComment"
       parameters:
@@ -531,7 +555,7 @@ paths:
   /tickets/{ticketId}/comments/{commentId}:
     delete:
       tags:
-      - "Tickets"
+      - "tickets"
       summary: "Delete Ticket Comment"
       description: "This can only be done by the logged in user."
       operationId: "deleteTicketComment"
@@ -624,8 +648,10 @@ components:
           type: "string"
         creationDate:
           type: "string"
-          format: "date"
+          format: "date-time"
         status:
+          type: "string"
+        message:
           type: "string"
       xml:
         name: "Notification"
@@ -658,7 +684,7 @@ components:
         hours:
           type: "integer"
       xml:
-        name: "Notification"
+        name: "Ticket"
     TicketCreation:
       type: "object"
       properties:
@@ -673,7 +699,7 @@ components:
         assignedUserId:
           type: "string"
       xml:
-        name: "Notification"
+        name: "TicketCreation"
     TicketUpdate:
       type: "object"
       properties:
@@ -685,8 +711,10 @@ components:
           type: "string"
         assignedUserId:
           type: "string"
+        status:
+          type: "string"
       xml:
-        name: "Notification"
+        name: "TicketUpdate"
     TicketComment:
       type: "object"
       properties:
@@ -708,6 +736,8 @@ components:
           type: "string"
         comment:
           type: "string"
+        hours:
+          type: "integer"
     User:
       type: "object"
       properties:

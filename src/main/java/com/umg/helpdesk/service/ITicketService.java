@@ -24,4 +24,6 @@ public interface ITicketService {
 	
 	TicketDto updateTicket(String id, TicketUpdateDto ticketUpdateDto);
 	
+	TicketDto closeTicket(String id);
+	
 }

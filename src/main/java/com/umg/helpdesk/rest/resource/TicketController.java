@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.umg.helpdesk.rest.gen.dto.TicketCommentCreationDto;
@@ -67,6 +68,15 @@ public class TicketController implements TicketsApi {
 	@Override
 	public ResponseEntity<TicketDto> updateTicket(String id, @Valid TicketUpdateDto ticketUpdateDto) {
 		TicketDto ticket = ticketService.updateTicket(id, ticketUpdateDto);
+		if (ticket == null)
+			return ResponseEntity.notFound().build();
+		
+		return new ResponseEntity<TicketDto>(ticket, HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<TicketDto> closeTicket(@PathVariable("ticketId") String ticketId) {
+		TicketDto ticket = ticketService.closeTicket(ticketId);
 		if (ticket == null)
 			return ResponseEntity.notFound().build();
 		

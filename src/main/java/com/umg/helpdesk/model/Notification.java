@@ -37,4 +37,7 @@ public class Notification {
 	@Column(name = "STATUS")
 	private NotificationStatus status;
 	
+	@Column(name = "MESSAGE")
+	private String message;
+	
 }
