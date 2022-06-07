@@ -11,4 +11,6 @@ public interface ITicketCommentRepository extends JpaRepository<TicketComment, L
 
 	List<TicketComment> findAllByTicketId(Long ticketId, Pageable pageable);
 	
+	List<TicketComment> findAllByTicketId(Long ticketId);
+	
 }

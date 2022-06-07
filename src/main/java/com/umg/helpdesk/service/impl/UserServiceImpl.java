@@ -15,11 +15,14 @@ import com.umg.helpdesk.model.Department;
 import com.umg.helpdesk.model.User;
 import com.umg.helpdesk.model.UserRole;
 import com.umg.helpdesk.repository.IDepartmentRepository;
+import com.umg.helpdesk.repository.INotificationRepository;
 import com.umg.helpdesk.repository.IUserRepository;
+import com.umg.helpdesk.rest.gen.dto.NotificationDto;
 import com.umg.helpdesk.rest.gen.dto.UserCreationDto;
 import com.umg.helpdesk.rest.gen.dto.UserDto;
 import com.umg.helpdesk.rest.gen.dto.UserUpdateDto;
 import com.umg.helpdesk.service.IUserService;
+import com.umg.helpdesk.service.mapper.NotificationMapper;
 import com.umg.helpdesk.service.mapper.UserMapper;
 import com.umg.helpdesk.service.utils.ModelUtils;
 
@@ -34,7 +37,13 @@ public class UserServiceImpl implements IUserService {
 	
 	@Autowired
 	private UserMapper userMapper;
-		
+	
+	@Autowired
+	private INotificationRepository notificationRepository;
+	
+	@Autowired
+	private NotificationMapper notificationMapper;
+	
 	@Override
 	public List<UserDto> listUsers(Integer offset, Integer limit) {
 		int pageSize = ModelUtils.getPageLimit(limit);
@@ -98,6 +107,24 @@ public class UserServiceImpl implements IUserService {
 			return userMapper.toDto(opUser.get());
 
 		return null;
+	}
+
+	@Override
+	public UserDto login(String username, String pwd) {
+		Optional<User> user = userRepository.getFirstByUsername(username);
+		if (!user.isPresent())
+			return null;
+		
+		if (user.get().getPassword().equals(pwd))
+			return userMapper.toDto(user.get());
+			
+		return null;
+	}
+
+	@Override
+	public List<NotificationDto> listNotificationsByUserId(String userId) {
+		return notificationRepository.findAllByUserIdOrderByNotificationIdDesc	(Long.parseLong(userId)).stream()
+				.map(notificationMapper::toDto).collect(Collectors.toList());
 	}
 
 }

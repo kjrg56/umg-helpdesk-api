@@ -2,6 +2,7 @@ package com.umg.helpdesk.service;
 
 import java.util.List;
 
+import com.umg.helpdesk.rest.gen.dto.NotificationDto;
 import com.umg.helpdesk.rest.gen.dto.UserCreationDto;
 import com.umg.helpdesk.rest.gen.dto.UserDto;
 import com.umg.helpdesk.rest.gen.dto.UserUpdateDto;
@@ -15,5 +16,9 @@ public interface IUserService {
 	UserDto updateUser(String userId, UserUpdateDto userCreationDto);
 	
 	UserDto getUserById(String userId);
+	
+	UserDto login(String username, String pwd);
+	
+	List<NotificationDto> listNotificationsByUserId(String userId);
 	
 }

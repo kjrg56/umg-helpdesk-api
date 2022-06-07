@@ -42,8 +42,9 @@ public class UserController implements UsersApi {
 	}
 
 	@Override
-	public ResponseEntity<List<NotificationDto>> listNotificationsByUserId(@PathVariable(name = "id", required = true) String userId, @Valid @RequestParam(value = "offset", required = false) Integer offset, @Valid @RequestParam(value = "limit", required = false) Integer limit) {
-		return UsersApi.super.listNotificationsByUserId(userId, offset, limit);
+	public ResponseEntity<List<NotificationDto>> listNotificationsByUserId(@PathVariable(name = "userId", required = true) String userId, @Valid @RequestParam(value = "offset", required = false) Integer offset, @Valid @RequestParam(value = "limit", required = false) Integer limit) {
+		List<NotificationDto> list = userService.listNotificationsByUserId(userId);
+		return new ResponseEntity<List<NotificationDto>>(list, HttpStatus.OK);
 	}
 
 	@Override
@@ -54,8 +55,11 @@ public class UserController implements UsersApi {
 
 	@Override
 	public ResponseEntity<UserDto> loginUser(@NotNull @Valid String username, @NotNull @Valid String password) {
-		// TODO Auto-generated method stub
-		return UsersApi.super.loginUser(username, password);
+		UserDto user = userService.login(username, password);
+		if (user == null)
+			return new ResponseEntity<UserDto>(HttpStatus.UNAUTHORIZED);
+		
+		return new ResponseEntity<UserDto>(user, HttpStatus.OK);
 	}
 
 	@Override

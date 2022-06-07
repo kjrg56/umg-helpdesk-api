@@ -7,6 +7,7 @@ import com.umg.helpdesk.rest.gen.dto.TicketCommentDto;
 import com.umg.helpdesk.rest.gen.dto.TicketCreationDto;
 import com.umg.helpdesk.rest.gen.dto.TicketDto;
 import com.umg.helpdesk.rest.gen.dto.TicketUpdateDto;
+import com.umg.helpdesk.rest.gen.dto.TicketsByStatusDto;
 
 public interface ITicketService {
 
@@ -20,10 +21,14 @@ public interface ITicketService {
 	
 	List<TicketCommentDto> listTicketCommentsById(String ticketId, Integer offset, Integer limit);
 	
-	List<TicketDto> listTickets(Integer offset, Integer limit);
+	List<TicketDto> listTickets(Integer offset, Integer limit, String userId);
 	
 	TicketDto updateTicket(String id, TicketUpdateDto ticketUpdateDto);
 	
 	TicketDto closeTicket(String id);
+	
+	List<TicketsByStatusDto> getTicketAnalyticsByStatus();
+	
+	void deleteTicket(String id);
 	
 }

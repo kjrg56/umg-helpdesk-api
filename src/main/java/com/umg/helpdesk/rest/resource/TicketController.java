@@ -1,5 +1,6 @@
 package com.umg.helpdesk.rest.resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -15,6 +16,10 @@ import com.umg.helpdesk.rest.gen.dto.TicketCommentDto;
 import com.umg.helpdesk.rest.gen.dto.TicketCreationDto;
 import com.umg.helpdesk.rest.gen.dto.TicketDto;
 import com.umg.helpdesk.rest.gen.dto.TicketUpdateDto;
+import com.umg.helpdesk.rest.gen.dto.TicketsByCategoryDto;
+import com.umg.helpdesk.rest.gen.dto.TicketsByDaysDto;
+import com.umg.helpdesk.rest.gen.dto.TicketsByStatusDto;
+import com.umg.helpdesk.rest.gen.dto.TicketsByUserDto;
 import com.umg.helpdesk.rest.gen.spec.TicketsApi;
 import com.umg.helpdesk.service.ITicketService;
 
@@ -60,8 +65,8 @@ public class TicketController implements TicketsApi {
 	}
 
 	@Override
-	public ResponseEntity<List<TicketDto>> listTickets(@Valid Integer offset, @Valid Integer limit) {
-		List<TicketDto> tickets = ticketService.listTickets(offset, limit);
+	public ResponseEntity<List<TicketDto>> listTickets(@Valid Integer offset, @Valid Integer limit, @Valid String userId) {
+		List<TicketDto> tickets = ticketService.listTickets(offset, limit, userId);
 		return new ResponseEntity<List<TicketDto>>(tickets, HttpStatus.OK);
 	}
 
@@ -81,6 +86,36 @@ public class TicketController implements TicketsApi {
 			return ResponseEntity.notFound().build();
 		
 		return new ResponseEntity<TicketDto>(ticket, HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<List<TicketsByCategoryDto>> getTicketAnalyticsByCategories() {
+		List<TicketsByCategoryDto> list = new ArrayList<TicketsByCategoryDto>();
+		return new ResponseEntity<List<TicketsByCategoryDto>>(list, HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<List<TicketsByDaysDto>> getTicketAnalyticsByDays() {
+		List<TicketsByDaysDto> list = new ArrayList<TicketsByDaysDto>();
+		return new ResponseEntity<List<TicketsByDaysDto>>(list, HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<List<TicketsByStatusDto>> getTicketAnalyticsByStatus() {
+		List<TicketsByStatusDto> list = ticketService.getTicketAnalyticsByStatus();
+		return new ResponseEntity<List<TicketsByStatusDto>>(list, HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<List<TicketsByUserDto>> getTicketAnalyticsByUsers() {
+		List<TicketsByUserDto> list = new ArrayList<TicketsByUserDto>();
+		return new ResponseEntity<List<TicketsByUserDto>>(list, HttpStatus.OK);
+	}
+
+	@Override
+	public ResponseEntity<TicketDto> deleteTicket(String id) {
+		ticketService.deleteTicket(id);
+		return new ResponseEntity<TicketDto>(HttpStatus.OK);
 	}
 
 }

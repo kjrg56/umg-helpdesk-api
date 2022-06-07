@@ -385,6 +385,11 @@ paths:
         required: false
         schema:
           type: "integer"
+      - name: "userId"
+        in: "query"
+        required: false
+        schema:
+          type: "string"
       responses:
         202:
           description: OK
@@ -411,6 +416,66 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ticket'
+  /tickets/analyticsByStatus:
+    get:
+      tags:
+      - "tickets"
+      summary: "List tickets"
+      operationId: "getTicketAnalyticsByStatus"
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/TicketsByStatus'
+  /tickets/analyticsByCategories:
+    get:
+      tags:
+      - "tickets"
+      summary: "List tickets"
+      operationId: "getTicketAnalyticsByCategories"
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/TicketsByCategory'
+  /tickets/analyticsByDays:
+    get:
+      tags:
+      - "tickets"
+      summary: "List tickets"
+      operationId: "getTicketAnalyticsByDays"
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/TicketsByDays'
+  /tickets/analyticsByUsers:
+    get:
+      tags:
+      - "tickets"
+      summary: "List tickets"
+      operationId: "getTicketAnalyticsByUsers"
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: '#/components/schemas/TicketsByUser'
   /tickets/{id}:
     get:
       tags:
@@ -454,6 +519,29 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TicketUpdate'
+      responses:
+        202:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        404:
+          description: "Not found"
+        400:
+          description: "Invalid"
+    delete:
+      tags:
+      - "tickets"
+      summary: "Delete Ticket"
+      description: "This can only be done by the logged in user."
+      operationId: "deleteTicket"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
       responses:
         202:
           description: OK
@@ -794,6 +882,34 @@ components:
           type: "string"
       xml:
         name: "UserUpdate"
+    TicketsByStatus:
+      type: "object"
+      properties:
+        status:
+          type: "string"
+        quantity:
+          type: "integer"
+    TicketsByDays:
+      type: "object"
+      properties:
+        day:
+          type: "string"
+        hours:
+          type: "integer"
+    TicketsByCategory:
+      type: "object"
+      properties:
+        category:
+          type: "string"
+        percentage:
+          type: "integer"
+    TicketsByUser:
+      type: "object"
+      properties:
+        user:
+          type: "string"
+        quantity:
+          type: "integer"
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"

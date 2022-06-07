@@ -1,6 +1,7 @@
 package com.umg.helpdesk.service.impl;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,6 +32,7 @@ import com.umg.helpdesk.rest.gen.dto.TicketCommentDto;
 import com.umg.helpdesk.rest.gen.dto.TicketCreationDto;
 import com.umg.helpdesk.rest.gen.dto.TicketDto;
 import com.umg.helpdesk.rest.gen.dto.TicketUpdateDto;
+import com.umg.helpdesk.rest.gen.dto.TicketsByStatusDto;
 import com.umg.helpdesk.service.ITicketService;
 import com.umg.helpdesk.service.mapper.NotificationMapper;
 import com.umg.helpdesk.service.mapper.TicketCommentMapper;
@@ -93,7 +95,7 @@ public class TicketServiceImpl implements ITicketService {
 		ticket = ticketRepository.save(ticket);
 		
 		if (ticket.getStatus().compareTo(TicketStatus.Assigned) == 0)
-			sendNotification(ticket.getTicketId(), ticket.getUserCreated().getUserId(), "Nuevo Ticket Asignado");
+			sendNotification(ticket.getTicketId(), ticket.getUserCreated().getUserId(), "Nuevo Ticket Asignado - #"+ticket.getTicketId() + ": " + ticket.getName());
 		
 		return ticketMapper.toDto(ticket);
 	}
@@ -151,14 +153,21 @@ public class TicketServiceImpl implements ITicketService {
 	}
 
 	@Override
-	public List<TicketDto> listTickets(Integer offset, Integer limit) {
+	public List<TicketDto> listTickets(Integer offset, Integer limit, String userId) {
 		limit = ModelUtils.getPageLimit(limit);
 		int page = ModelUtils.getPageNumber(offset, limit);
 		Pageable pageable = PageRequest.of(page, limit, Direction.DESC, "TicketId");
 		
-		return ticketRepository.findAll(pageable).stream()
-				.map(ticketMapper::toDto)
-				.collect(Collectors.toList());
+		if (userId != null) {
+			return ticketRepository.findAll(pageable).stream()
+					.map(ticketMapper::toDto)
+					.collect(Collectors.toList());	
+		} else {
+			return ticketRepository.findAll(pageable).stream()
+					.filter(i -> i.getUserCreated().getUserId().equals(Long.parseLong(userId)))
+					.map(ticketMapper::toDto)
+					.collect(Collectors.toList());
+		}
 	}
 
 	@Transactional
@@ -195,7 +204,7 @@ public class TicketServiceImpl implements ITicketService {
 			ticket.setAssignationDate(OffsetDateTime.now());
 			ticket.setStatus(TicketStatus.Assigned);
 			
-			sendNotification(ticket.getTicketId(), ticket.getUserCreated().getUserId(), "Nuevo Ticket Asignado");
+			sendNotification(ticket.getTicketId(), ticket.getUserCreated().getUserId(), "Nuevo Ticket Asignado - #"+ticket.getTicketId() + ": " + ticket.getName());
 		}
 		
 		if (ticketUpdateDto.getStatus() != null)
@@ -216,9 +225,57 @@ public class TicketServiceImpl implements ITicketService {
 		ticket.setStatus(TicketStatus.Closed);
 		ticket = ticketRepository.save(ticket);
 		
-		sendNotification(ticket.getTicketId(), ticket.getUserCreated().getUserId(), "Ticket Cerrado");
+		sendNotification(ticket.getTicketId(), ticket.getUserCreated().getUserId(), "Ticket Cerrado - #"+ticket.getTicketId());
 		
 		return ticketMapper.toDto(ticket);
+	}
+	
+	@Override
+	public List<TicketsByStatusDto> getTicketAnalyticsByStatus() {
+		List<Ticket> list = ticketRepository.findAll();
+		
+		Long countPending = list.stream().filter(i -> i.getStatus().compareTo(TicketStatus.Pending) == 0).count();
+		Long countAssigned = list.stream().filter(i -> i.getStatus().compareTo(TicketStatus.Assigned) == 0).count();
+		Long countProgress = list.stream().filter(i -> i.getStatus().compareTo(TicketStatus.InProgress) == 0).count();
+		Long countClosed = list.stream().filter(i -> i.getStatus().compareTo(TicketStatus.Closed) == 0).count();
+		
+		List<TicketsByStatusDto> listByStatus = new ArrayList<TicketsByStatusDto>();
+		
+		TicketsByStatusDto t1 = new TicketsByStatusDto();
+		t1.setStatus(TicketStatus.Pending.name());
+		t1.setQuantity(countPending.intValue());
+		listByStatus.add(t1);
+
+		TicketsByStatusDto t2 = new TicketsByStatusDto();
+		t2.setStatus(TicketStatus.Assigned.name());
+		t2.setQuantity(countAssigned.intValue());
+		listByStatus.add(t2);
+		
+		TicketsByStatusDto t3 = new TicketsByStatusDto();
+		t3.setStatus(TicketStatus.InProgress.name());
+		t3.setQuantity(countProgress.intValue());
+		listByStatus.add(t3);
+		
+		TicketsByStatusDto t4 = new TicketsByStatusDto();
+		t4.setStatus(TicketStatus.Closed.name());
+		t4.setQuantity(countClosed.intValue());
+		listByStatus.add(t4);
+		
+		return listByStatus;
+	}
+	
+	@org.springframework.transaction.annotation.Transactional
+	@Override
+	public void deleteTicket(String id) {
+		List<Notification> notifications = notificationRepository.findAllByTicketId(Long.parseLong(id));
+		if (!notifications.isEmpty())
+			notificationRepository.deleteAll(notifications);
+		
+		List<TicketComment> comments = ticketCommentRepository.findAllByTicketId(Long.parseLong(id));
+		if (!comments.isEmpty())
+			ticketCommentRepository.deleteAll(comments);
+		
+		ticketRepository.deleteById(Long.parseLong(id));
 	}
 	
 	public NotificationDto sendNotification(Long ticketId, Long userId, String message) {
