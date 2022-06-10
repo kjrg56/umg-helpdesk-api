@@ -95,7 +95,7 @@ public class TicketServiceImpl implements ITicketService {
 		ticket = ticketRepository.save(ticket);
 		
 		if (ticket.getStatus().compareTo(TicketStatus.Assigned) == 0)
-			sendNotification(ticket.getTicketId(), ticket.getUserCreated().getUserId(), "Nuevo Ticket Asignado - #"+ticket.getTicketId() + ": " + ticket.getName());
+			sendNotification(ticket.getTicketId(), ticket.getUserAssigned().getUserId(), "Nuevo Ticket Asignado - #"+ticket.getTicketId() + ": " + ticket.getName());
 		
 		return ticketMapper.toDto(ticket);
 	}
@@ -158,13 +158,13 @@ public class TicketServiceImpl implements ITicketService {
 		int page = ModelUtils.getPageNumber(offset, limit);
 		Pageable pageable = PageRequest.of(page, limit, Direction.DESC, "TicketId");
 		
-		if (userId != null) {
+		if (userId == null) {
 			return ticketRepository.findAll(pageable).stream()
 					.map(ticketMapper::toDto)
 					.collect(Collectors.toList());	
 		} else {
 			return ticketRepository.findAll(pageable).stream()
-					.filter(i -> i.getUserCreated().getUserId().equals(Long.parseLong(userId)))
+					.filter(i -> (i.getUserCreated().getUserId().equals(Long.parseLong(userId)) || (i.getUserAssigned() != null && i.getUserAssigned().getUserId().equals(Long.parseLong(userId)))) )
 					.map(ticketMapper::toDto)
 					.collect(Collectors.toList());
 		}
@@ -204,7 +204,7 @@ public class TicketServiceImpl implements ITicketService {
 			ticket.setAssignationDate(OffsetDateTime.now());
 			ticket.setStatus(TicketStatus.Assigned);
 			
-			sendNotification(ticket.getTicketId(), ticket.getUserCreated().getUserId(), "Nuevo Ticket Asignado - #"+ticket.getTicketId() + ": " + ticket.getName());
+			sendNotification(ticket.getTicketId(), ticket.getUserAssigned().getUserId(), "Nuevo Ticket Asignado - #"+ticket.getTicketId() + ": " + ticket.getName());
 		}
 		
 		if (ticketUpdateDto.getStatus() != null)
